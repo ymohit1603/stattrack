@@ -27,7 +27,7 @@ import { LeaderboardWidget } from '@/components/dashboard/LeaderboardWidget';
 import { formatTime } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import useSWR from 'swr';
-import { format } from 'date-fns';
+import { format, startOfWeek, endOfWeek, isWithinInterval } from 'date-fns';
 import { AnimatedCard } from '@/components/ui/animated-card';
 import { LazyLoad } from '@/components/ui/lazy-load';
 
@@ -149,10 +149,35 @@ export default function Dashboard() {
     }
   );
 
+  // Calculate weekly coding days
+  const weeklyCodingDays = useMemo(() => {
+    if (!stats?.daily_stats) return 0;
+    
+    const now = new Date();
+    const weekStart = startOfWeek(now, { weekStartsOn: 1 }); // Start from Monday
+    const weekEnd = endOfWeek(now, { weekStartsOn: 1 }); // End on Sunday
+
+    // Count days with coding activity this week
+    return stats.daily_stats.filter(day => {
+      const dayDate = new Date(day.date);
+      return isWithinInterval(dayDate, { start: weekStart, end: weekEnd }) && day.total_seconds > 0;
+    }).length;
+  }, [stats?.daily_stats]);
+
   // Separate SWR call for goals that doesn't depend on timeframe
   const { data: goalsData } = useSWR(
     '/api/stats/goals',
-    () => statsApi.getUserStats('today').then(res => res.data.goals),
+    () => statsApi.getUserStats('today').then(res => {
+      const goals = res.data.goals;
+      // Update weekly coding days with actual count
+      return {
+        ...goals,
+        weekly_coding_days: {
+          ...goals.weekly_coding_days,
+          current: weeklyCodingDays
+        }
+      };
+    }),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,

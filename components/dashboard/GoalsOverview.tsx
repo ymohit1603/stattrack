@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import { Clock, Calendar } from "lucide-react";
 import { LazyLoad } from '@/components/ui/lazy-load';
+import { cn } from '@/lib/utils';
 
 interface GoalsOverviewProps {
   goals: {
@@ -43,7 +44,17 @@ export function GoalsOverview({ goals }: GoalsOverviewProps) {
                 {formatTime(goals.daily_coding_time.current)} / {formatTime(goals.daily_coding_time.target)}
               </span>
             </div>
-            <Progress value={goals.daily_coding_time.progress} className="h-2" />
+            <div className="relative h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <div 
+                className={cn(
+                  "h-full w-full flex-1 transition-all",
+                  "bg-green-500"
+                )}
+                style={{ 
+                  width: `${(goals.daily_coding_time.current / goals.daily_coding_time.target) * 100}%` 
+                }}
+              />
+            </div>
           </div>
 
           <div className="space-y-2">
@@ -56,7 +67,17 @@ export function GoalsOverview({ goals }: GoalsOverviewProps) {
                 {goals.weekly_coding_days.current} / {goals.weekly_coding_days.target} days
               </span>
             </div>
-            <Progress value={goals.weekly_coding_days.progress} className="h-2" />
+            <div className="relative h-2 w-full overflow-hidden rounded-full bg-secondary">
+              <div 
+                className={cn(
+                  "h-full w-full flex-1 transition-all",
+                  "bg-green-500"
+                )}
+                style={{ 
+                  width: `${(goals.weekly_coding_days.current / goals.weekly_coding_days.target) * 100}%` 
+                }}
+              />
+            </div>
           </div>
         </CardContent>
       </Card>
