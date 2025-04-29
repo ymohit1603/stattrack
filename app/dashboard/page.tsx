@@ -28,6 +28,8 @@ import { formatTime } from '@/lib/utils';
 import { useTheme } from 'next-themes';
 import useSWR from 'swr';
 import { format } from 'date-fns';
+import { AnimatedCard } from '@/components/ui/animated-card';
+import { LazyLoad } from '@/components/ui/lazy-load';
 
 // Types
 type Timeframe = 'today' | 'last_24_hours' | 'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year' | 'all_years';
@@ -147,6 +149,17 @@ export default function Dashboard() {
     }
   );
 
+  // Separate SWR call for goals that doesn't depend on timeframe
+  const { data: goalsData } = useSWR(
+    '/api/stats/goals',
+    () => statsApi.getUserStats('today').then(res => res.data.goals),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      dedupingInterval: 5000,
+    }
+  );
+
   // Memoize formatted data for charts
   const chartData = useMemo(() => {
     if (!stats) return null;
@@ -243,7 +256,7 @@ export default function Dashboard() {
 
   return (
     <DashboardErrorBoundary>
-      <div className="min-h-screen pt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen pt-2 pb-10 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
         <div className="max-w-7xl mx-auto">
           {/* Header with Time Range Selector and Controls */}
           <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mb-8">
@@ -259,7 +272,6 @@ export default function Dashboard() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="today">Today</SelectItem>
-      
                   <SelectItem value="last_7_days">Last 7 Days</SelectItem>
                   <SelectItem value="last_30_days">Last 30 Days</SelectItem>
                   <SelectItem value="last_6_months">Last 6 Months</SelectItem>
@@ -285,98 +297,96 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Summary Cards */}
+          {/* Summary Cards - Always visible */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <StatsCard
-              title="Total Coding Time"
-              value={stats.summary.total_seconds != null ? formatTime(stats.summary.total_seconds) : "0:00"}
-              change={stats.summary.change_percentage}
-              icon={Clock}
-              tooltip="Total time spent coding in the selected period"
-            />
-            <StatsCard
-              title="Today's Coding Time"
-              value={(stats.summary.today_seconds != null ? formatTime(stats.summary.today_seconds) : "0:00")}
-              change={stats.summary.today_change_percentage}
-              icon={Calendar}
-              tooltip="Time spent coding today"
-            />
-            <StatsCard
-              title="Average Daily Time"
-              value={formatTime(stats.summary.avg_daily_seconds)}
-              change={stats.summary.avg_daily_change_percentage}
-              icon={TrendingUp}
-              tooltip="Average time spent coding per day"
-            />
-            <StatsCard
-              title="Total Sessions"
-              value={stats.summary.total_sessions}
-              change={stats.summary.sessions_change_percentage}
-              icon={Activity}
-              tooltip="Total number of coding sessions"
-            />
-          </div>
-
-          {/* Charts Section */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Suspense fallback={<Card><CardContent><Loader2 className="h-8 w-8 animate-spin" /></CardContent></Card>}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Coding Activity</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {chartData && (
-                    <BarChart 
-                      data={chartData.activity}
-                      yAxisLabel="Hours"
-                      isMonthly={timeframe === 'last_year' || timeframe === 'last_6_months'}
-                      isYearly={timeframe === 'all_years'}
-                    />
-                  )}
-                </CardContent>
-              </Card>
-            </Suspense>
-
-            <Suspense fallback={<Card><CardContent><Loader2 className="h-8 w-8 animate-spin" /></CardContent></Card>}>
-              <Card>
-                <CardHeader>
-                  <CardTitle className="text-lg">Lines Written</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  {chartData && (
-                    <LineChart 
-                      data={chartData.lines}
-                      yAxisLabel="Lines"
-                      isMonthly={timeframe === 'last_year' || timeframe === 'last_6_months'}
-                      isYearly={timeframe === 'all_years'}
-                    />
-                  )}
-                </CardContent>
-              </Card>
-            </Suspense>
-          </div>
-
-          {/* Language Distribution and Recent Activity */}
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <Suspense fallback={<Card><CardContent><Loader2 className="h-8 w-8 animate-spin" /></CardContent></Card>}>
-              <LanguageDistribution 
-                languages={stats.languages} 
-                timeframe={timeframe}
+            <AnimatedCard delay={0.1}>
+              <StatsCard
+                title="Total Coding Time"
+                value={stats.summary.total_seconds != null ? formatTime(stats.summary.total_seconds) : "0:00"}
+                change={stats.summary.change_percentage}
+                icon={Clock}
+                tooltip="Total time spent coding in the selected period"
               />
-            </Suspense>
-            <Suspense fallback={<Card><CardContent><Loader2 className="h-8 w-8 animate-spin" /></CardContent></Card>}>
-              <RecentSessions sessions={stats.recent_sessions} />
-            </Suspense>
+            </AnimatedCard>
+            <AnimatedCard delay={0.2}>
+              <StatsCard
+                title="Today's Coding Time"
+                value={(stats.summary.today_seconds != null ? formatTime(stats.summary.today_seconds) : "0:00")}
+                change={stats.summary.today_change_percentage}
+                icon={Calendar}
+                tooltip="Time spent coding today"
+              />
+            </AnimatedCard>
+            <AnimatedCard delay={0.3}>
+              <StatsCard
+                title="Average Daily Time"
+                value={formatTime(stats.summary.avg_daily_seconds)}
+                change={stats.summary.avg_daily_change_percentage}
+                icon={TrendingUp}
+                tooltip="Average time spent coding per day"
+              />
+            </AnimatedCard>
+            <AnimatedCard delay={0.4}>
+              <StatsCard
+                title="Total Sessions"
+                value={stats.summary.total_sessions}
+                change={stats.summary.sessions_change_percentage}
+                icon={Activity}
+                tooltip="Total number of coding sessions"
+              />
+            </AnimatedCard>
           </div>
+
+          {/* Charts Section - Lazy loaded */}
+          <LazyLoad>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <AnimatedCard title="Coding Activity" delay={0.5}>
+                {chartData && (
+                  <BarChart 
+                    data={chartData.activity}
+                    yAxisLabel="Hours"
+                    isMonthly={timeframe === 'last_year' || timeframe === 'last_6_months'}
+                    isYearly={timeframe === 'all_years'}
+                  />
+                )}
+              </AnimatedCard>
+
+              <AnimatedCard title="Lines Written" delay={0.6}>
+                {chartData && (
+                  <LineChart 
+                    data={chartData.lines}
+                    yAxisLabel="Lines"
+                    isMonthly={timeframe === 'last_year' || timeframe === 'last_6_months'}
+                    isYearly={timeframe === 'all_years'}
+                  />
+                )}
+              </AnimatedCard>
+            </div>
+          </LazyLoad>
+
+          {/* Language Distribution and Recent Activity - Lazy loaded */}
+          <LazyLoad>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+              <AnimatedCard delay={0.7}>
+                <LanguageDistribution 
+                  languages={stats.languages} 
+                  timeframe={timeframe}
+                />
+              </AnimatedCard>
+              <AnimatedCard delay={0.8}>
+                <RecentSessions sessions={stats.recent_sessions} />
+              </AnimatedCard>
+            </div>
+          </LazyLoad>
 
           {/* Goals and Leaderboard */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <Suspense fallback={<Card><CardContent><Loader2 className="h-8 w-8 animate-spin" /></CardContent></Card>}>
-              <GoalsOverview goals={stats.goals} />
-            </Suspense>
-            <Suspense fallback={<Card><CardContent><Loader2 className="h-8 w-8 animate-spin" /></CardContent></Card>}>
+            <AnimatedCard delay={0.9}>
+              <GoalsOverview goals={goalsData || stats?.goals} />
+            </AnimatedCard>
+            <AnimatedCard delay={1.0}>
               <LeaderboardWidget leaderboard={stats.leaderboard} />
-            </Suspense>
+            </AnimatedCard>
           </div>
         </div>
       </div>
