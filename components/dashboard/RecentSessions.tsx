@@ -1,55 +1,42 @@
 'use client';
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Clock, Code } from 'lucide-react';
-import type { StatsResponse } from '@/lib/api';
+import { formatDistanceToNow } from 'date-fns';
+
+interface Session {
+  start_time: string;
+  end_time: string;
+  duration: number;
+  total_lines: number;
+  languages: string[];
+}
 
 interface RecentSessionsProps {
-  sessions: StatsResponse['recent_sessions'];
+  sessions: Session[];
 }
 
 export function RecentSessions({ sessions }: RecentSessionsProps) {
-  const formatTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const minutes = Math.floor((seconds % 3600) / 60);
-    return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
-  };
-
-  const formatDate = (date: string) => {
-    return new Date(date).toLocaleString();
-  };
-
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Recent Activity</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <div className="space-y-4">
+    <div className="rounded-lg border bg-card text-card-foreground shadow-sm">
+      <div className="p-6">
+        <h3 className="text-lg font-medium">Recent Sessions</h3>
+        <div className="mt-4 space-y-4">
           {sessions.map((session, index) => (
-            <div key={index} className="flex items-start space-x-4 p-3 rounded-lg bg-muted/50">
-              <div className="p-2 rounded-full bg-primary/10">
-                <Clock className="h-4 w-4 text-primary" />
-              </div>
-              <div className="flex-1 space-y-1">
-                <p className="text-sm font-medium">
-                  Coded for {formatTime(session.duration)}
+            <div key={index} className="flex items-center justify-between">
+              <div>
+                <p className="font-medium">
+                  {new Date(session.start_time).toLocaleDateString()} {new Date(session.start_time).toLocaleTimeString()}
                 </p>
-                <div className="flex items-center text-xs text-muted-foreground">
-                  <Code className="h-3 w-3 mr-1" />
-                  {session.languages.join(', ')}
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  {formatDate(session.start_time)}
+                <p className="text-sm text-muted-foreground">
+                  {formatDistanceToNow(new Date(session.start_time), { addSuffix: true })}
                 </p>
               </div>
-              <div className="text-xs font-medium">
-                {session.total_lines > 0 && `+${session.total_lines} lines`}
+              <div className="text-sm font-medium">
+                {Math.floor(session.duration / 60)}m
               </div>
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 } 

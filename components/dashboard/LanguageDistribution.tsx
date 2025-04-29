@@ -6,16 +6,27 @@ import type { StatsResponse } from '@/lib/api';
 
 interface LanguageDistributionProps {
   languages: StatsResponse['languages'];
+  timeframe: string;
 }
 
 const COLORS = ['#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B'];
 
-export function LanguageDistribution({ languages }: LanguageDistributionProps) {
+export function LanguageDistribution({ languages, timeframe }: LanguageDistributionProps) {
   const formatTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
     return hours > 0 ? `${hours}h ${minutes}m` : `${minutes}m`;
   };
+
+  // Calculate total seconds for percentage calculation
+  const totalSeconds = languages.reduce((sum, lang) => sum + lang.total_seconds, 0);
+
+  // Transform data to include percentages
+  const chartData = languages.map(lang => ({
+    name: lang.language,
+    value: lang.total_seconds,
+    percentage: (lang.total_seconds / totalSeconds) * 100
+  }));
 
   return (
     <Card>
@@ -27,36 +38,36 @@ export function LanguageDistribution({ languages }: LanguageDistributionProps) {
           <ResponsiveContainer width="100%" height="100%">
             <PieChart>
               <Pie
-                data={languages}
-                dataKey="percentage"
-                nameKey="language"
+                data={chartData}
+                dataKey="value"
+                nameKey="name"
                 cx="50%"
                 cy="50%"
                 outerRadius={100}
-                label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
+                label={({ name, percentage }) => `${name} (${percentage.toFixed(0)}%)`}
               >
-                {languages.map((entry, index) => (
-                  <Cell key={entry.language} fill={COLORS[index % COLORS.length]} />
+                {chartData.map((entry, index) => (
+                  <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
                 ))}
               </Pie>
               <Tooltip 
-                formatter={(value: number) => [`${value.toFixed(2)}%`]}
+                formatter={(value: number) => [formatTime(value), 'Time']}
               />
             </PieChart>
           </ResponsiveContainer>
         </div>
         <div className="mt-4 space-y-2">
-          {languages.slice(0, 5).map((lang, index) => (
-            <div key={lang.language} className="flex items-center justify-between">
+          {chartData.slice(0, 5).map((lang, index) => (
+            <div key={lang.name} className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <div 
                   className="w-3 h-3 rounded-sm" 
                   style={{ backgroundColor: COLORS[index % COLORS.length] }} 
                 />
-                <span className="text-sm">{lang.language}</span>
+                <span className="text-sm">{lang.name}</span>
               </div>
               <span className="text-sm text-muted-foreground">
-                {formatTime(lang.total_seconds)}
+                {formatTime(lang.value)}
               </span>
             </div>
           ))}
