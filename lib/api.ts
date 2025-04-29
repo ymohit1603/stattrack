@@ -134,6 +134,12 @@ export interface StatsResponse {
     total_seconds: number;
     prev_period_seconds: number;
     change_percentage: number;
+    today_seconds: number;
+    today_change_percentage: number;
+    avg_daily_seconds: number;
+    avg_daily_change_percentage: number;
+    total_sessions: number;
+    sessions_change_percentage: number;
   };
   daily_stats: Array<{
     date: string;
@@ -206,7 +212,10 @@ export const statsApi = {
   },
 
   getHeatmapStats: async (year?: number): Promise<{ data: Array<{ date: string; total_seconds: number }> }> => {
-    const response = await api.get<Array<{ date: string; total_seconds: number }>>('/users/current/stats/heatmap', { params: { year } });
+    const params = new URLSearchParams();
+    if (year) params.append('year', year.toString());
+    
+    const response = await api.get<Array<{ date: string; total_seconds: number }>>('/users/current/stats/heatmap', { params });
     return { data: response.data };
   }
 };
