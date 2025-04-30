@@ -18,20 +18,20 @@ export function RecentSessions({ sessions }: RecentSessionsProps) {
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {sessions.map((session, index) => (
-              <div key={index} className="flex items-center justify-between">
+          {sessions.map((session, index) => (
+            <div key={index} className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-green-500" />
                   <span className="text-sm">
                     {format(new Date(session.start_time), 'MMM d, h:mm a')}
                   </span>
-                </div>
+              </div>
                 <span className="text-sm text-muted-foreground">
                   {formatTime(session.duration)}
                 </span>
-              </div>
-            ))}
-          </div>
+            </div>
+          ))}
+        </div>
         </CardContent>
       </Card>
     </LazyLoad>

@@ -29,21 +29,21 @@ export function GoalsOverview({ goals }: GoalsOverviewProps) {
 
   return (
     <LazyLoad>
-      <Card>
-        <CardHeader>
-          <CardTitle>Goals Overview</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-8">
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Clock className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Daily Coding Time</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {formatTime(goals.daily_coding_time.current)} / {formatTime(goals.daily_coding_time.target)}
-              </span>
+    <Card>
+      <CardHeader>
+        <CardTitle>Goals Overview</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-8">
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Clock className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Daily Coding Time</span>
             </div>
+            <span className="text-sm text-muted-foreground">
+              {formatTime(goals.daily_coding_time.current)} / {formatTime(goals.daily_coding_time.target)}
+            </span>
+          </div>
             <div className="relative h-2 w-full overflow-hidden rounded-full bg-secondary">
               <div 
                 className={cn(
@@ -55,18 +55,18 @@ export function GoalsOverview({ goals }: GoalsOverviewProps) {
                 }}
               />
             </div>
-          </div>
+        </div>
 
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-2">
-                <Calendar className="h-4 w-4 text-muted-foreground" />
-                <span className="text-sm font-medium">Weekly Coding Days</span>
-              </div>
-              <span className="text-sm text-muted-foreground">
-                {goals.weekly_coding_days.current} / {goals.weekly_coding_days.target} days
-              </span>
+        <div className="space-y-2">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center space-x-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              <span className="text-sm font-medium">Weekly Coding Days</span>
             </div>
+            <span className="text-sm text-muted-foreground">
+              {goals.weekly_coding_days.current} / {goals.weekly_coding_days.target} days
+            </span>
+          </div>
             <div className="relative h-2 w-full overflow-hidden rounded-full bg-secondary">
               <div 
                 className={cn(
@@ -78,9 +78,9 @@ export function GoalsOverview({ goals }: GoalsOverviewProps) {
                 }}
               />
             </div>
-          </div>
-        </CardContent>
-      </Card>
+        </div>
+      </CardContent>
+    </Card>
     </LazyLoad>
   );
 } 

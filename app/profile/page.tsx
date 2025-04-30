@@ -34,7 +34,10 @@ import {
   Settings,
   BarChart3,
   LineChart,
-  PieChart
+  PieChart,
+  Trophy,
+  Target,
+  Activity
 } from 'lucide-react';
 import { userApi, leaderboardApi, statsApi, type StatsResponse } from '@/lib/api';
 import type { UserProfile, ProjectStats } from '@/lib/api';
@@ -45,6 +48,8 @@ import { TopLanguages } from '@/components/profile/TopLanguages';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
+import { LazyLoad } from '@/components/ui/lazy-load';
+import { useRouter } from 'next/navigation';
 
 // Types
 type TimeRange = 'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year';
@@ -353,37 +358,58 @@ const NewProjectDialog = ({
 };
 
 const Profile = () => {
+  const router = useRouter();
   const [timeRange, setTimeRange] = useState<TimeRange>('last_7_days');
   const [isNewProjectDialogOpen, setIsNewProjectDialogOpen] = useState(false);
   const { toast } = useToast();
 
-  // Use SWR for data fetching
+  // Fetch user profile
   const { data: profile, error: profileError, isLoading: isProfileLoading, mutate: mutateProfile } = useSWR(
     '/api/user/profile',
     () => userApi.getCurrentUser().then(res => res.data),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
+      onError: (err) => {
+        if (err?.response?.status === 401) {
+          router.push('/auth');
+        }
+      }
     }
   );
 
-  const { data: projects, error: projectsError, isLoading: isProjectsLoading, mutate: mutateProjects } = useSWR(
-    '/api/user/projects',
-    () => leaderboardApi.getUserProjects().then(res => res.data),
-    {
-      revalidateOnFocus: false,
-      revalidateOnReconnect: true,
-    }
-  );
-
+  // Fetch stats
   const { data: stats, error: statsError, isLoading: isStatsLoading, mutate: mutateStats } = useSWR(
     ['/api/stats', timeRange],
     () => statsApi.getUserStats(timeRange).then(res => res.data),
     {
       revalidateOnFocus: false,
       revalidateOnReconnect: true,
+      onError: (err) => {
+        if (err?.response?.status === 401) {
+          router.push('/auth');
+        }
+      }
     }
   );
+
+  // Fetch leaderboard
+  const { data: leaderboard, error: leaderboardError, isLoading: isLeaderboardLoading } = useSWR(
+    '/api/leaderboard',
+    () => leaderboardApi.getLeaderboard().then(res => res.data),
+    {
+      revalidateOnFocus: false,
+      revalidateOnReconnect: true,
+      onError: (err) => {
+        if (err?.response?.status === 401) {
+          router.push('/auth');
+        }
+      }
+    }
+  );
+
+  const isLoading = isProfileLoading || isStatsLoading || isLeaderboardLoading;
+  const error = profileError || statsError || leaderboardError;
 
   const handleVisibilityToggle = async (checked: boolean) => {
     if (!profile) return;
@@ -441,7 +467,6 @@ const Profile = () => {
 
   const handleRefresh = () => {
     mutateProfile();
-    mutateProjects();
     mutateStats();
   };
 
@@ -452,7 +477,7 @@ const Profile = () => {
         title: 'Project created',
         description: 'Your new project has been created successfully.',
       });
-      mutateProjects();
+      // mutateProjects();
     } catch (err) {
       console.error('Failed to create project:', err);
       toast({
@@ -470,7 +495,7 @@ const Profile = () => {
         title: 'Project deleted',
         description: 'The project has been deleted successfully.',
       });
-      mutateProjects();
+      // mutateProjects();
     } catch (err) {
       console.error('Failed to delete project:', err);
       toast({
@@ -481,16 +506,14 @@ const Profile = () => {
     }
   };
 
-  if (isProfileLoading || isProjectsLoading || isStatsLoading) {
+  if (isLoading) {
     return <LoadingSkeleton />;
   }
 
-  if (profileError || projectsError || statsError || !profile) {
+  if (error || !profile || !stats) {
     return (
       <div className="min-h-screen pt-20 flex flex-col items-center justify-center gap-4">
-        <p className="text-destructive">
-          {profileError?.message || projectsError?.message || statsError?.message || 'Failed to load profile'}
-        </p>
+        <p className="text-destructive">{error?.message || 'Failed to load profile'}</p>
         <Button onClick={handleRefresh} variant="outline">
           <RefreshCw className="h-4 w-4 mr-2" />
           Try Again
@@ -501,235 +524,168 @@ const Profile = () => {
 
   return (
     <ProfileErrorBoundary>
-      <TooltipProvider>
-        <div className="min-h-screen pt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
-          <div className="max-w-7xl mx-auto">
-            {/* Profile Header */}
-            <Card className="mb-8 overflow-hidden border-0 shadow-md">
-              <div className="h-32 bg-gradient-to-r from-codeflow-primary via-codeflow-secondary to-codeflow-accent"></div>
-              <CardContent className="relative px-6 pb-6">
-                <div className="flex flex-col md:flex-row md:items-end -mt-16 mb-4 gap-6">
-                  <Avatar className="h-32 w-32 border-4 border-white dark:border-gray-800 rounded-full shadow-md">
-                    <AvatarImage src={profile.profile_url} alt={profile.username} />
-                    <AvatarFallback>{profile.username}</AvatarFallback>
-                  </Avatar>
-                  <div className="flex-grow">
-                    <div className="flex flex-col md:flex-row md:items-center gap-2 md:gap-4">
-                      <h1 className="text-3xl font-bold">{profile.username}</h1>
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <Badge className="w-fit bg-codeflow-primary/10 text-codeflow-primary border-codeflow-primary/20 text-xs md:text-sm">
-                            <Terminal className="h-3 w-3 mr-1" />
-                            {profile.subscriptionTier}
-                          </Badge>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Your current subscription tier</p>
-                        </TooltipContent>
-                      </Tooltip>
+      <div className="min-h-screen pt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+        <div className="max-w-7xl mx-auto">
+          {/* Profile Header */}
+          <Card className="mb-8 overflow-hidden border-0 shadow-md">
+            <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+            <CardContent className="relative px-6 pb-6">
+              <div className="flex flex-col md:flex-row md:items-end -mt-16 mb-4 gap-6">
+                <Avatar className="h-32 w-32 border-4 border-white dark:border-gray-900">
+                  <AvatarImage src={profile.profile_url} alt={profile.username} />
+                  <AvatarFallback>{profile.username[0]}</AvatarFallback>
+                </Avatar>
+                <div className="flex-grow">
+                  <div className="flex items-center gap-4">
+                    <h1 className="text-3xl font-bold">{profile.username}</h1>
+                    <div className="flex items-center gap-2">
+                      <Badge variant="secondary" className="flex items-center gap-1">
+                        <Terminal className="h-4 w-4" />
+                        {profile.subscriptionTier}
+                      </Badge>
+                      {profile.teamId && (
+                        <Badge variant="outline" className="flex items-center gap-1">
+                          <Users className="h-4 w-4" />
+                          Team Member
+                        </Badge>
+                      )}
                     </div>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">@{profile.username}</p>
-                    {profile.address && <p className="mt-2 text-sm md:text-base">{profile.address}</p>}
                   </div>
-                  <div className="flex space-x-2 md:self-start md:mt-8">
-                    <Button size="sm" variant="outline" className="border-codeflow-primary text-codeflow-primary" onClick={handleEditProfile}>
+                  <div className="flex flex-wrap gap-4 mt-2">
+                    {profile.github_username && (
+                      <a
+                        href={`https://github.com/${profile.github_username}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                      >
+                        <Github className="h-4 w-4" />
+                        {profile.github_username}
+                      </a>
+                    )}
+                    {profile.website && (
+                      <a
+                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
+                      >
+                        <Globe className="h-4 w-4" />
+                        {profile.website}
+                      </a>
+                    )}
+                    {profile.address && (
+                      <span className="text-sm text-muted-foreground flex items-center gap-1">
+                        <Globe className="h-4 w-4" />
+                        {profile.address}
+                      </span>
+                    )}
+                  </div>
+                  <div className="flex items-center gap-4 mt-4">
+                    <Button variant="outline" size="sm" onClick={handleEditProfile}>
                       <Edit className="h-4 w-4 mr-2" />
                       Edit Profile
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={handleShare}>
+                    <Button variant="outline" size="sm" onClick={handleShare}>
                       <Share2 className="h-4 w-4 mr-2" />
-                      Share
+                      Share Profile
                     </Button>
-                    <Button size="sm" variant="ghost" onClick={handleRefresh}>
-                      <RefreshCw className="h-4 w-4 mr-2" />
-                      Refresh
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={!profile.isPrivate}
+                        onCheckedChange={handleVisibilityToggle}
+                      />
+                      <span className="text-sm text-muted-foreground">
+                        {!profile.isPrivate ? 'Public' : 'Private'}
+                      </span>
+                    </div>
                   </div>
                 </div>
-
-                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mt-6">
-                  <div className="flex flex-wrap gap-4 md:gap-6">
-                    {profile.createdAt && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center text-sm">
-                            <Calendar className="h-4 w-4 mr-2 text-gray-500" />
-                            <span>Joined {new Date(profile.createdAt).toLocaleDateString()}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Your account creation date</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                    {profile.address && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center text-sm">
-                            <Globe className="h-4 w-4 mr-2 text-gray-500" />
-                            <span>{profile.address}</span>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Your location</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                    {profile.website && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center text-sm">
-                            <Globe className="h-4 w-4 mr-2 text-gray-500" />
-                            <a
-                              href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-codeflow-primary hover:underline"
-                            >
-                              {profile.website}
-                            </a>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Your personal website</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                    {profile.github_username && (
-                      <Tooltip>
-                        <TooltipTrigger>
-                          <div className="flex items-center text-sm">
-                            <Github className="h-4 w-4 mr-2 text-gray-500" />
-                            <a
-                              href={`https://github.com/${profile.github_username}`}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="text-codeflow-primary hover:underline"
-                            >
-                              {profile.github_username}
-                            </a>
-                          </div>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p>Your GitHub profile</p>
-                        </TooltipContent>
-                      </Tooltip>
-                    )}
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <Tooltip>
-                      <TooltipTrigger>
-                        <span className="text-sm">Public Profile</span>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>Toggle profile visibility</p>
-                      </TooltipContent>
-                    </Tooltip>
-                    <Switch checked={!profile.isPrivate} onCheckedChange={handleVisibilityToggle} />
-                    {!profile.isPrivate ? (
-                      <Eye className="h-4 w-4 text-green-500" />
-                    ) : (
-                      <Shield className="h-4 w-4 text-amber-500" />
-                    )}
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="mt-6 mb-6">
-                <Card>
-                  <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
-                      <Calendar className="h-4 w-4" />
-                      Activity Heatmap
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <HeatmapComponent initialData={stats?.daily_stats || []} />
-                  </CardContent>
-                </Card>
               </div>
+            </CardContent>
+          </Card>
 
-            <div className="flex flex-col gap-6 mb-6">
-               {/* Stats Section */}
-            <div className="mt-8">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-2xl font-bold">Your Stats</h2>
-                <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
-                  <SelectTrigger className="w-[180px]">
-                    <Calendar className="h-4 w-4 mr-2" />
-                    <SelectValue placeholder="Time Period" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="last_7_days">Last 7 Days</SelectItem>
-                    <SelectItem value="last_30_days">Last 30 Days</SelectItem>
-                    <SelectItem value="last_6_months">Last 6 Months</SelectItem>
-                    <SelectItem value="last_year">Last Year</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+          <div className="flex items-center justify-end mb-4">
 
-              
+          <Select value={timeRange} onValueChange={(value) => setTimeRange(value as TimeRange)}>
+                    <SelectTrigger className="w-[180px]">
+                      <Calendar className="h-4 w-4 mr-2" />
+                      <SelectValue placeholder="Time Period" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="last_7_days">Last 7 Days</SelectItem>
+                      <SelectItem value="last_30_days">Last 30 Days</SelectItem>
+                      <SelectItem value="last_6_months">Last 6 Months</SelectItem>
+                      <SelectItem value="last_year">Last Year</SelectItem>
+                    </SelectContent>
+                  </Select>
+
           </div>
-              
-                <Suspense fallback={<Card><CardContent><Loader2 className=" animate-spin" /></CardContent></Card>}>
-                  {stats && <StatsOverview stats={stats} />}
-                </Suspense>
+          {/* Stats Overview */}
+          <LazyLoad>
+            <StatsOverview stats={stats} />
+            
+          </LazyLoad>
 
-                <Suspense fallback={<Card><CardContent><Loader2 className=" animate-spin" /></CardContent></Card>}>
-                  {stats && <TopLanguages languages={stats.languages} />}
-                </Suspense>
-              </div>
+          
 
-              
-            </div>
-
-            {/* Projects Section */}
-            <Card>
-              <CardHeader className="flex flex-row items-center justify-between">
-                <CardTitle>Your Projects</CardTitle>
-                <Button size="sm" onClick={() => setIsNewProjectDialogOpen(true)}>
-                  <Plus className="h-4 w-4 mr-2" />
-                  New Project
-                </Button>
+          {/* Activity Heatmap */}
+          <LazyLoad>
+            <Card className="mt-8">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Activity Heatmap</CardTitle>
+                  
+                </div>
               </CardHeader>
               <CardContent>
-                <div className="space-y-4">
-                  <AnimatePresence>
-                    {projects?.length > 0 ? (
-                      projects.map((project, index) => (
-                        <ProjectCard 
-                          key={index} 
-                          project={project} 
-                          onDelete={handleDeleteProject}
-                        />
-                      ))
-                    ) : (
-                      <EmptyState
-                        icon={FileCode}
-                        title="No projects found"
-                        description="You haven't started any projects yet."
-                        action={
-                          <Button variant="outline" onClick={() => setIsNewProjectDialogOpen(true)}>
-                            Create Your First Project
-                          </Button>
-                        }
-                      />
-                    )}
-                  </AnimatePresence>
-                </div>
+                <HeatmapComponent />
               </CardContent>
             </Card>
+          </LazyLoad>
 
-           
+          {/* Language Distribution */}
+          <LazyLoad>
+            <Card className="mt-8">
+              <CardHeader>
+                <CardTitle>Language Distribution</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <TopLanguages languages={stats.languages} />
+              </CardContent>
+            </Card>
+          </LazyLoad>
+
+          {/* Projects Section */}
+          {/* <div className="mt-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-2xl font-bold">Projects</h2>
+              <Button onClick={() => setIsNewProjectDialogOpen(true)}>
+                <Plus className="h-4 w-4 mr-2" />
+                New Project
+              </Button>
+            </div>
+            <div className="space-y-4">
+              <AnimatePresence>
+                {profile.projects.map((project) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    onDelete={handleDeleteProject}
+                  />
+                ))}
+              </AnimatePresence>
+            </div>
+          </div> */}
+
+          {/* New Project Dialog */}
+          <NewProjectDialog
+            open={isNewProjectDialogOpen}
+            onOpenChange={setIsNewProjectDialogOpen}
+            onSubmit={handleCreateProject}
+          />
         </div>
-
-        <NewProjectDialog
-          open={isNewProjectDialogOpen}
-          onOpenChange={setIsNewProjectDialogOpen}
-          onSubmit={handleCreateProject}
-        />
-      </TooltipProvider>
+      </div>
     </ProfileErrorBoundary>
   );
 };

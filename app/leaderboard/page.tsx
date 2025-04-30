@@ -9,42 +9,13 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Trophy, Clock, Star, Search, Zap, Loader2, GitCommit, Code } from 'lucide-react';
 import { leaderboardApi } from '@/lib/api';
-
-interface LeaderboardData {
-  range: {
-    start: string;
-    end: string;
-    range: string;
-    timezone: string;
-  };
-  current_user: {
-    rank: number;
-    total_seconds: number;
-    days_coded: number;
-    running_total: number;
-  } | null;
-  language: string | null;
-  page: number;
-  total_pages: number;
-  ranks: Array<{
-    user: {
-      id: number;
-      username: string;
-      profile_url: string | null;
-    };
-    rank: number;
-    running_total: number;
-    total_seconds: number;
-    days_coded: number;
-    badge: 'gold' | 'silver' | 'bronze' | null;
-  }>;
-}
+import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable';
+import type { LeaderboardResponse } from '@/lib/api';
 
 const Leaderboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [timeframe, setTimeframe] = useState<'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year'>('last_7_days');
-  const [leaderboardData, setLeaderboardData] = useState<LeaderboardData | null>(null);
-  const [filteredRanks, setFilteredRanks] = useState<LeaderboardData['ranks']>([]);
+  const [leaderboardData, setLeaderboardData] = useState<LeaderboardResponse['data'] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -55,7 +26,6 @@ const Leaderboard: React.FC = () => {
         setError(null);
         const response = await leaderboardApi.getLeaderboard(timeframe);
         setLeaderboardData(response.data);
-        setFilteredRanks(response.data.ranks);
       } catch (err) {
         console.error('Failed to fetch leaderboard:', err);
         setError('Failed to load leaderboard data. Please try again later.');
@@ -74,13 +44,12 @@ const Leaderboard: React.FC = () => {
     if (!leaderboardData) return;
     
     if (term.trim() === '') {
-      setFilteredRanks(leaderboardData.ranks);
+      setLeaderboardData({ ...leaderboardData, ranks: leaderboardData.ranks });
     } else {
-      setFilteredRanks(
-        leaderboardData.ranks.filter(rank => 
-          rank.user.username.toLowerCase().includes(term.toLowerCase())
-        )
+      const filteredRanks = leaderboardData.ranks.filter((rank) => 
+        rank.user.username.toLowerCase().includes(term.toLowerCase())
       );
+      setLeaderboardData({ ...leaderboardData, ranks: filteredRanks });
     }
   };
 
@@ -113,12 +82,12 @@ const Leaderboard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen pt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen pt-4 pb-10 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="hero-gradient rounded-2xl p-6 mb-8 text-white">
+        <div className="hero-gradient rounded-2xl p-6 mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
-            <Trophy className="h-8 w-8 inline-block mr-3" />
+            <Trophy className="h-8 w-8 inline-block mr-3 text-yellow-500" />
             Coder Leaderboard
           </h1>
           <p className="text-lg opacity-90 mb-4">
@@ -130,7 +99,7 @@ const Leaderboard: React.FC = () => {
               <div className="flex items-center gap-4 mt-2">
                 <div className="text-2xl font-bold">#{leaderboardData.current_user.rank}</div>
                 <div>
-                  <p className="text-sm opacity-80">{formatTime(leaderboardData.current_user.total_seconds)} coded</p>
+                  <p className="text-sm opacity-80">{leaderboardData.current_user.total_seconds / 3600}h coded</p>
                   <p className="text-sm opacity-80">{leaderboardData.current_user.days_coded} active days</p>
                 </div>
               </div>
@@ -173,81 +142,11 @@ const Leaderboard: React.FC = () => {
           <CardHeader className="bg-gray-100 dark:bg-gray-800">
             <CardTitle className="text-lg flex items-center">
               <Zap className="h-5 w-5 mr-2 text-codeflow-primary" />
-              Top Coders
+              Cracked Devs
             </CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left whitespace-nowrap p-4">Rank</th>
-                    <th className="text-left whitespace-nowrap p-4">Coder</th>
-                    <th className="text-left whitespace-nowrap p-4">
-                      <div className="flex items-center">
-                        <Clock className="h-4 w-4 mr-1" />
-                        Coding Time
-                      </div>
-                    </th>
-                    <th className="text-left whitespace-nowrap p-4">
-                      <div className="flex items-center">
-                        <Star className="h-4 w-4 mr-1" />
-                        Active Days
-                      </div>
-                    </th>
-                    <th className="text-left whitespace-nowrap p-4">Achievement</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredRanks.map((rank) => (
-                    <tr 
-                      key={rank.user.id} 
-                      className="border-b hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors cursor-pointer"
-                    >
-                      <td className="p-4">
-                        <div className={`w-8 h-8 rounded-full flex items-center justify-center font-bold ${getRankStyles(rank.rank)}`}>
-                          {rank.rank}
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="flex items-center">
-                          <Avatar className="h-10 w-10 mr-3">
-                            <AvatarImage src={rank.user.profile_url || undefined} alt={rank.user.username} />
-                            <AvatarFallback>{rank.user.username.charAt(0).toUpperCase()}</AvatarFallback>
-                          </Avatar>
-                          <div>
-                            <div className="font-medium">@{rank.user.username}</div>
-                          </div>
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        <div className="font-medium">{formatTime(rank.total_seconds)}</div>
-                      </td>
-                      <td className="p-4">
-                        <div className="font-medium flex items-center">
-                          <Zap className="h-4 w-4 mr-1 text-amber-500" />
-                          {rank.days_coded} days
-                        </div>
-                      </td>
-                      <td className="p-4">
-                        {rank.badge && (
-                          <Badge 
-                            variant="outline" 
-                            className={`
-                              ${rank.badge === 'gold' ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/20' : ''}
-                              ${rank.badge === 'silver' ? 'bg-gray-400/10 text-gray-400 border-gray-400/20' : ''}
-                              ${rank.badge === 'bronze' ? 'bg-amber-600/10 text-amber-600 border-amber-600/20' : ''}
-                            `}
-                          >
-                            {rank.badge.charAt(0).toUpperCase() + rank.badge.slice(1)} Coder
-                          </Badge>
-                        )}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+            {leaderboardData && <LeaderboardTable data={leaderboardData} />}
           </CardContent>
         </Card>
 

@@ -325,73 +325,73 @@ export default function Dashboard() {
           {/* Summary Cards - Always visible */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <AnimatedCard delay={0.1}>
-              <StatsCard
-                title="Total Coding Time"
-                value={stats.summary.total_seconds != null ? formatTime(stats.summary.total_seconds) : "0:00"}
-                change={stats.summary.change_percentage}
-                icon={Clock}
-                tooltip="Total time spent coding in the selected period"
-              />
+            <StatsCard
+              title="Total Coding Time"
+              value={stats.summary.total_seconds != null ? formatTime(stats.summary.total_seconds) : "0:00"}
+              change={stats.summary.change_percentage}
+              icon={Clock}
+              tooltip="Total time spent coding in the selected period"
+            />
             </AnimatedCard>
             <AnimatedCard delay={0.2}>
-              <StatsCard
-                title="Today's Coding Time"
-                value={(stats.summary.today_seconds != null ? formatTime(stats.summary.today_seconds) : "0:00")}
-                change={stats.summary.today_change_percentage}
-                icon={Calendar}
-                tooltip="Time spent coding today"
-              />
+            <StatsCard
+              title="Today's Coding Time"
+              value={(stats.summary.today_seconds != null ? formatTime(stats.summary.today_seconds) : "0:00")}
+              change={stats.summary.today_change_percentage}
+              icon={Calendar}
+              tooltip="Time spent coding today"
+            />
             </AnimatedCard>
             <AnimatedCard delay={0.3}>
-              <StatsCard
-                title="Average Daily Time"
-                value={formatTime(stats.summary.avg_daily_seconds)}
-                change={stats.summary.avg_daily_change_percentage}
-                icon={TrendingUp}
-                tooltip="Average time spent coding per day"
-              />
+            <StatsCard
+              title="Average Daily Time"
+              value={formatTime(stats.summary.avg_daily_seconds)}
+              change={stats.summary.avg_daily_change_percentage}
+              icon={TrendingUp}
+              tooltip="Average time spent coding per day"
+            />
             </AnimatedCard>
             <AnimatedCard delay={0.4}>
-              <StatsCard
-                title="Total Sessions"
-                value={stats.summary.total_sessions}
-                change={stats.summary.sessions_change_percentage}
-                icon={Activity}
-                tooltip="Total number of coding sessions"
-              />
+            <StatsCard
+              title="Total Sessions"
+              value={stats.summary.total_sessions}
+              change={stats.summary.sessions_change_percentage}
+              icon={Activity}
+              tooltip="Total number of coding sessions"
+            />
             </AnimatedCard>
           </div>
 
           {/* Charts Section - Lazy loaded */}
           <LazyLoad>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <AnimatedCard title="Coding Activity" delay={0.5}>
-                {chartData && (
-                  <BarChart 
-                    data={chartData.activity}
-                    yAxisLabel="Hours"
+                  {chartData && (
+                    <BarChart 
+                      data={chartData.activity}
+                      yAxisLabel="Hours"
                     isMonthly={timeframe === 'last_year' || timeframe === 'last_6_months'}
                     isYearly={timeframe === 'all_years'}
-                  />
-                )}
+                    />
+                  )}
               </AnimatedCard>
 
               <AnimatedCard title="Lines Written" delay={0.6}>
-                {chartData && (
-                  <LineChart 
-                    data={chartData.lines}
-                    yAxisLabel="Lines"
+                  {chartData && (
+                    <LineChart 
+                      data={chartData.lines}
+                      yAxisLabel="Lines"
                     isMonthly={timeframe === 'last_year' || timeframe === 'last_6_months'}
                     isYearly={timeframe === 'all_years'}
-                  />
-                )}
+                    />
+                  )}
               </AnimatedCard>
-            </div>
+          </div>
           </LazyLoad>
 
           {/* Language Distribution and Recent Activity - Lazy loaded */}
           <LazyLoad>
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
               <AnimatedCard delay={0.7}>
                 <LanguageDistribution 
                   languages={stats.languages} 
@@ -399,9 +399,9 @@ export default function Dashboard() {
                 />
               </AnimatedCard>
               <AnimatedCard delay={0.8}>
-                <RecentSessions sessions={stats.recent_sessions} />
+              <RecentSessions sessions={stats.recent_sessions} />
               </AnimatedCard>
-            </div>
+          </div>
           </LazyLoad>
 
           {/* Goals and Leaderboard */}

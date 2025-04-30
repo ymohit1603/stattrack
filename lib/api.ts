@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { redirect } from 'next/navigation';
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3000/api/v1',
@@ -15,6 +16,20 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Response interceptor for handling 401 errors
+api.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    if (error?.response?.status === 401) {
+      // Clear auth token
+      localStorage.removeItem('authToken');
+      // Redirect to auth page
+      window.location.href = '/auth';
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Types
 export type AppName = 'X' | 'LinkedIn';
@@ -84,6 +99,11 @@ export interface LeaderboardResponse {
       total_seconds: number;
       days_coded: number;
       running_total: number;
+      languages: Array<{
+        name: string;
+        total_seconds: number;
+        percentage: number;
+      }>;
     } | null;
     language: string | null;
     page: number;
@@ -99,6 +119,11 @@ export interface LeaderboardResponse {
       total_seconds: number;
       days_coded: number;
       badge: 'gold' | 'silver' | 'bronze' | null;
+      languages: Array<{
+        name: string;
+        total_seconds: number;
+        percentage: number;
+      }>;
     }>;
   };
 }

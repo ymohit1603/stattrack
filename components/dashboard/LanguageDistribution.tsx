@@ -31,51 +31,51 @@ export function LanguageDistribution({ languages, timeframe }: LanguageDistribut
 
   return (
     <LazyLoad>
-      <Card>
-        <CardHeader>
-          <CardTitle>Language Distribution</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="h-[300px]">
-            <ResponsiveContainer width="100%" height="100%">
-              <PieChart>
-                <Pie
+    <Card>
+      <CardHeader>
+        <CardTitle>Language Distribution</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div className="h-[300px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <PieChart>
+              <Pie
                   data={chartData}
                   dataKey="value"
                   nameKey="name"
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={100}
+                cx="50%"
+                cy="50%"
+                outerRadius={100}
                   label={({ name, percentage }) => `${name} (${percentage.toFixed(0)}%)`}
-                >
+              >
                   {chartData.map((entry, index) => (
                     <Cell key={entry.name} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip 
+                ))}
+              </Pie>
+              <Tooltip 
                   formatter={(value: number) => [formatTime(value), 'Time']}
-                />
-              </PieChart>
-            </ResponsiveContainer>
-          </div>
-          <div className="mt-4 space-y-2">
+              />
+            </PieChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="mt-4 space-y-2">
             {chartData.slice(0, 5).map((lang, index) => (
               <div key={lang.name} className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <div 
-                    className="w-3 h-3 rounded-sm" 
-                    style={{ backgroundColor: COLORS[index % COLORS.length] }} 
-                  />
+              <div className="flex items-center gap-2">
+                <div 
+                  className="w-3 h-3 rounded-sm" 
+                  style={{ backgroundColor: COLORS[index % COLORS.length] }} 
+                />
                   <span className="text-sm">{lang.name}</span>
-                </div>
-                <span className="text-sm text-muted-foreground">
-                  {formatTime(lang.value)}
-                </span>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+              <span className="text-sm text-muted-foreground">
+                  {formatTime(lang.value)}
+              </span>
+            </div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
     </LazyLoad>
   );
 } 
