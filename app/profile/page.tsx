@@ -50,6 +50,7 @@ import useSWR from 'swr';
 import { motion, AnimatePresence } from 'framer-motion';
 import { LazyLoad } from '@/components/ui/lazy-load';
 import { useRouter } from 'next/navigation';
+import { EditProfileModal } from '@/components/profile/EditProfileModal';
 
 // Types
 type TimeRange = 'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year';
@@ -459,9 +460,15 @@ const Profile = () => {
   };
 
   const handleEditProfile = () => {
+    // The EditProfileModal will handle the profile update
+    // No need for additional logic here as it's handled in the modal
+  };
+
+  const handleProfileUpdate = (updatedProfile: UserProfile) => {
+    mutateProfile();
     toast({
-      title: 'Coming soon',
-      description: 'Profile editing will be available soon!',
+      title: 'Profile updated',
+      description: 'Your profile has been successfully updated.',
     });
   };
 
@@ -524,11 +531,11 @@ const Profile = () => {
 
   return (
     <ProfileErrorBoundary>
-      <div className="min-h-screen pt-20 pb-10 px-4 sm:px-6 lg:px-8 bg-gray-50 dark:bg-gray-900">
+      <div className="min-h-screen pt-4 pb-10 px-4 sm:px-6 lg:px-8 ">
         <div className="max-w-7xl mx-auto">
           {/* Profile Header */}
           <Card className="mb-8 overflow-hidden border-0 shadow-md">
-            <div className="h-32 bg-gradient-to-r from-blue-500 to-purple-500"></div>
+            <div className="h-32 bg-gradient-to-r from-gray-100 to-gray-800"></div>
             <CardContent className="relative px-6 pb-6">
               <div className="flex flex-col md:flex-row md:items-end -mt-16 mb-4 gap-6">
                 <Avatar className="h-32 w-32 border-4 border-white dark:border-gray-900">
@@ -582,15 +589,21 @@ const Profile = () => {
                     )}
                   </div>
                   <div className="flex items-center gap-4 mt-4">
-                    <Button variant="outline" size="sm" onClick={handleEditProfile}>
-                      <Edit className="h-4 w-4 mr-2" />
-                      Edit Profile
-                    </Button>
+                    <EditProfileModal 
+                      profile={profile} 
+                      onProfileUpdate={handleProfileUpdate}
+                      trigger={
+                        <Button variant="outline" size="sm">
+                          <Edit className="h-4 w-4 mr-2" />
+                          Edit Profile
+                        </Button>
+                      }
+                    />
                     <Button variant="outline" size="sm" onClick={handleShare}>
                       <Share2 className="h-4 w-4 mr-2" />
                       Share Profile
                     </Button>
-                    <div className="flex items-center gap-2">
+                    {/* <div className="flex items-center gap-2">
                       <Switch
                         checked={!profile.isPrivate}
                         onCheckedChange={handleVisibilityToggle}
@@ -598,7 +611,7 @@ const Profile = () => {
                       <span className="text-sm text-muted-foreground">
                         {!profile.isPrivate ? 'Public' : 'Private'}
                       </span>
-                    </div>
+                    </div> */}
                   </div>
                 </div>
               </div>

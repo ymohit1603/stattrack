@@ -91,7 +91,9 @@ export function EditProfileModal({ profile, onProfileUpdate, trigger }: EditProf
     setIsLoading(true);
 
     try {
+      console.log('Submitting form data:', formData);
       const updatedProfile = await userApi.updateProfile(formData);
+      console.log('Profile update response:', updatedProfile);
       onProfileUpdate(updatedProfile);
       setIsOpen(false);
       toast({
@@ -99,6 +101,7 @@ export function EditProfileModal({ profile, onProfileUpdate, trigger }: EditProf
         description: "Your profile has been successfully updated.",
       });
     } catch (err: unknown) {
+      console.error('Profile update error:', err);
       const errorMessage = err instanceof Error ? err.message : "Failed to update profile";
       toast({
         title: "Error",

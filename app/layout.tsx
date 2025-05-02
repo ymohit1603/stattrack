@@ -4,14 +4,14 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import AuthGuard from "@/components/AuthGuard";
 import MainLayout from "@/layouts/MainLayout";
+import { Toaster } from "@/components/ui/toaster";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "StatTrack - Your Coding Analytics Dashboard",
-  description: "Track your coding activity, analyze your productivity, and improve your development workflow with StatTrack.",
-  keywords: ["coding analytics", "productivity", "development", "time tracking", "programming"],
+  title: 'StatTrack',
+  description: 'Track your coding activity and improve your productivity',
 };
 
 export default function RootLayout({
@@ -27,6 +27,7 @@ export default function RootLayout({
             {children}
           </MainLayout>
         </AuthGuard>
+        <Toaster />
       </body>
     </html>
   );

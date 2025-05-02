@@ -3,7 +3,8 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { LanguagesColumn } from './LanguagesColumn';
 import type { LeaderboardResponse } from '@/lib/api';
-import { Twitter, Linkedin } from 'lucide-react';
+import {  Linkedin } from 'lucide-react';
+import { FaXTwitter } from "react-icons/fa6";
 
 interface LeaderboardTableProps {
   data: LeaderboardResponse['data'];
@@ -56,7 +57,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ data }) => {
                     <AvatarImage src={rank.user.profile_url || undefined} />
                     <AvatarFallback>{rank.user.username[0]}</AvatarFallback>
                   </Avatar>
-                  <span className="font-medium">{rank.user.username}</span>
+                  <span className="font-medium">{rank.user.username}{rank.user.app_name=="X" ? <FaXTwitter />:rank.user.app_name=="LinkedIn" ? <Linkedin className="h-4 w-4" />:null}</span>
                 </div>
               </td>
               <td className="py-4 px-4 text-right">

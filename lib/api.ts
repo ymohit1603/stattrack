@@ -113,6 +113,7 @@ export interface LeaderboardResponse {
         id: number;
         username: string;
         profile_url: string | null;
+        app_name: AppName;
       };
       rank: number;
       running_total: number;

@@ -11,6 +11,7 @@ import { Trophy, Clock, Star, Search, Zap, Loader2, GitCommit, Code } from 'luci
 import { leaderboardApi } from '@/lib/api';
 import { LeaderboardTable } from '@/components/leaderboard/LeaderboardTable';
 import type { LeaderboardResponse } from '@/lib/api';
+import { formatTime } from '@/lib/utils';
 
 const Leaderboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
@@ -53,10 +54,6 @@ const Leaderboard: React.FC = () => {
     }
   };
 
-  const formatTime = (seconds: number): string => {
-    const hours = Math.floor(seconds / 3600);
-    return `${hours}h`;
-  };
 
   const getRankStyles = (rank: number) => {
     if (rank === 1) return "bg-yellow-500 text-white";
@@ -99,7 +96,7 @@ const Leaderboard: React.FC = () => {
               <div className="flex items-center gap-4 mt-2">
                 <div className="text-2xl font-bold">#{leaderboardData.current_user.rank}</div>
                 <div>
-                  <p className="text-sm opacity-80">{leaderboardData.current_user.total_seconds / 3600}h coded</p>
+                  <p className="text-sm opacity-80">{formatTime(leaderboardData.current_user.total_seconds)} coded</p>
                   <p className="text-sm opacity-80">{leaderboardData.current_user.days_coded} active days</p>
                 </div>
               </div>
@@ -152,7 +149,7 @@ const Leaderboard: React.FC = () => {
         </Card>
 
         {/* Additional Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        {/* <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">Top Languages</CardTitle>
@@ -277,8 +274,8 @@ const Leaderboard: React.FC = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
-      </div>
+        </div>*/}
+      </div> 
     </div>
   );
 };
