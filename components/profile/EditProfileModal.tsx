@@ -128,7 +128,7 @@ export function EditProfileModal({ profile, onProfileUpdate, trigger }: EditProf
       <DialogTrigger asChild>
         {trigger || <Button variant="outline">Edit Profile</Button>}
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px]">
+      <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
           <DialogDescription>
@@ -136,138 +136,140 @@ export function EditProfileModal({ profile, onProfileUpdate, trigger }: EditProf
           </DialogDescription>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="username">Username</Label>
-            <Input
-              id="username"
-              name="username"
-              value={formData.username}
-              onChange={handleChange}
-              required
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="website">Website</Label>
-            <Input
-              id="website"
-              name="website"
-              value={formData.website}
-              onChange={handleChange}
-              placeholder="https://example.com"
-              type="url"
-              prefix={<Globe className="h-4 w-4 text-muted-foreground" />}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="github_username">GitHub Username</Label>
-            <Input
-              id="github_username"
-              name="github_username"
-              value={formData.github_username}
-              onChange={handleChange}
-              placeholder="username"
-              prefix={<Github className="h-4 w-4 text-muted-foreground" />}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="twitter_username">Twitter Username</Label>
-            <Input
-              id="twitter_username"
-              name="twitter_username"
-              value={formData.twitter_username}
-              onChange={handleChange}
-              placeholder="username"
-              prefix={<Twitter className="h-4 w-4 text-muted-foreground" />}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="linkedin_username">LinkedIn Username</Label>
-            <Input
-              id="linkedin_username"
-              name="linkedin_username"
-              value={formData.linkedin_username}
-              onChange={handleChange}
-              placeholder="username"
-              prefix={<Linkedin className="h-4 w-4 text-muted-foreground" />}
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="address">Location</Label>
-            <Input
-              id="address"
-              name="address"
-              value={formData.address}
-              onChange={handleChange}
-              placeholder="City, Country"
-            />
-          </div>
-
-          <div className="space-y-4 pt-4 border-t">
-            <h4 className="text-sm font-medium">Privacy Settings</h4>
-            
-            <div className="flex items-center justify-between">
-              <Label htmlFor="isPrivate">Private Profile</Label>
-              <Switch
-                id="isPrivate"
-                name="isPrivate"
-                checked={formData.isPrivate}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, isPrivate: checked }))
-                }
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="username">Username</Label>
+              <Input
+                id="username"
+                name="username"
+                value={formData.username}
+                onChange={handleChange}
+                required
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="editors_used_public">Show Editors Used</Label>
-              <Switch
-                id="editors_used_public"
-                name="editors_used_public"
-                checked={formData.editors_used_public}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, editors_used_public: checked }))
-                }
+            <div className="space-y-2">
+              <Label htmlFor="website">Website</Label>
+              <Input
+                id="website"
+                name="website"
+                value={formData.website}
+                onChange={handleChange}
+                placeholder="https://example.com"
+                type="url"
+                prefix={<Globe className="h-4 w-4 text-muted-foreground" />}
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="categories_used_public">Show Categories</Label>
-              <Switch
-                id="categories_used_public"
-                name="categories_used_public"
-                checked={formData.categories_used_public}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, categories_used_public: checked }))
-                }
+            <div className="space-y-2">
+              <Label htmlFor="github_username">GitHub Username</Label>
+              <Input
+                id="github_username"
+                name="github_username"
+                value={formData.github_username}
+                onChange={handleChange}
+                placeholder="username"
+                prefix={<Github className="h-4 w-4 text-muted-foreground" />}
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="os_used_public">Show Operating System</Label>
-              <Switch
-                id="os_used_public"
-                name="os_used_public"
-                checked={formData.os_used_public}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, os_used_public: checked }))
-                }
+            <div className="space-y-2">
+              <Label htmlFor="twitter_username">Twitter Username</Label>
+              <Input
+                id="twitter_username"
+                name="twitter_username"
+                value={formData.twitter_username}
+                onChange={handleChange}
+                placeholder="username"
+                prefix={<Twitter className="h-4 w-4 text-muted-foreground" />}
               />
             </div>
 
-            <div className="flex items-center justify-between">
-              <Label htmlFor="logged_time_public">Show Logged Time</Label>
-              <Switch
-                id="logged_time_public"
-                name="logged_time_public"
-                checked={formData.logged_time_public}
-                onCheckedChange={(checked) => 
-                  setFormData(prev => ({ ...prev, logged_time_public: checked }))
-                }
+            <div className="space-y-2">
+              <Label htmlFor="linkedin_username">LinkedIn Username</Label>
+              <Input
+                id="linkedin_username"
+                name="linkedin_username"
+                value={formData.linkedin_username}
+                onChange={handleChange}
+                placeholder="username"
+                prefix={<Linkedin className="h-4 w-4 text-muted-foreground" />}
               />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="address">Location</Label>
+              <Input
+                id="address"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                placeholder="City, Country"
+              />
+            </div>
+
+            <div className="space-y-4 pt-4 border-t">
+              <h4 className="text-sm font-medium">Privacy Settings</h4>
+              
+              <div className="flex items-center justify-between">
+                <Label htmlFor="isPrivate">Private Profile</Label>
+                <Switch
+                  id="isPrivate"
+                  name="isPrivate"
+                  checked={formData.isPrivate}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, isPrivate: checked }))
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="editors_used_public">Show Editors Used</Label>
+                <Switch
+                  id="editors_used_public"
+                  name="editors_used_public"
+                  checked={formData.editors_used_public}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, editors_used_public: checked }))
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="categories_used_public">Show Categories</Label>
+                <Switch
+                  id="categories_used_public"
+                  name="categories_used_public"
+                  checked={formData.categories_used_public}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, categories_used_public: checked }))
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="os_used_public">Show Operating System</Label>
+                <Switch
+                  id="os_used_public"
+                  name="os_used_public"
+                  checked={formData.os_used_public}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, os_used_public: checked }))
+                  }
+                />
+              </div>
+
+              <div className="flex items-center justify-between">
+                <Label htmlFor="logged_time_public">Show Logged Time</Label>
+                <Switch
+                  id="logged_time_public"
+                  name="logged_time_public"
+                  checked={formData.logged_time_public}
+                  onCheckedChange={(checked) => 
+                    setFormData(prev => ({ ...prev, logged_time_public: checked }))
+                  }
+                />
+              </div>
             </div>
           </div>
 

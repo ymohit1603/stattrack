@@ -37,7 +37,9 @@ import {
   PieChart,
   Trophy,
   Target,
-  Activity
+  Activity,
+  Twitter,
+  Linkedin
 } from 'lucide-react';
 import { userApi, leaderboardApi, statsApi, type StatsResponse } from '@/lib/api';
 import type { UserProfile, ProjectStats } from '@/lib/api';
@@ -51,6 +53,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { LazyLoad } from '@/components/ui/lazy-load';
 import { useRouter } from 'next/navigation';
 import { EditProfileModal } from '@/components/profile/EditProfileModal';
+import { TownhallBadge } from '@/components/profile/TownhallBadge';
 
 // Types
 type TimeRange = 'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year';
@@ -537,83 +540,74 @@ const Profile = () => {
           <Card className="mb-8 overflow-hidden border-0 shadow-md">
             <div className="h-32 bg-gradient-to-r from-gray-100 to-gray-800"></div>
             <CardContent className="relative px-6 pb-6">
-              <div className="flex flex-col md:flex-row md:items-end -mt-16 mb-4 gap-6">
-                <Avatar className="h-32 w-32 border-4 border-white dark:border-gray-900">
-                  <AvatarImage src={profile.profile_url} alt={profile.username} />
-                  <AvatarFallback>{profile.username[0]}</AvatarFallback>
-                </Avatar>
-                <div className="flex-grow">
-                  <div className="flex items-center gap-4">
-                    <h1 className="text-3xl font-bold">{profile.username}</h1>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="secondary" className="flex items-center gap-1">
-                        <Terminal className="h-4 w-4" />
-                        {profile.subscriptionTier}
-                      </Badge>
-                      {profile.teamId && (
-                        <Badge variant="outline" className="flex items-center gap-1">
-                          <Users className="h-4 w-4" />
-                          Team Member
-                        </Badge>
+              <div className="flex items-start justify-between mb-8">
+                <div className="flex items-center space-x-4 ">
+                  <Avatar className="h-20 w-20">
+                    <AvatarImage src={profile.profile_url} alt={profile.username} />
+                    <AvatarFallback>{profile.username.slice(0, 2).toUpperCase()}</AvatarFallback>
+                  </Avatar>
+                  <div>
+                    <h1 className="text-2xl font-bold">{profile.username}</h1>
+                    <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                      {profile.github_username && (
+                        <a
+                          href={`https://github.com/${profile.github_username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center hover:text-foreground"
+                        >
+                          <Github className="h-4 w-4 mr-1" />
+                          {profile.github_username}
+                        </a>
                       )}
+                      {profile.twitter_username && (
+                        <a
+                          href={`https://twitter.com/${profile.twitter_username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center hover:text-foreground"
+                        >
+                          <Twitter className="h-4 w-4 mr-1" />
+                          {profile.twitter_username}
+                        </a>
+                      )}
+                      {profile.linkedin_username && (
+                        <a
+                          href={`https://linkedin.com/in/${profile.linkedin_username}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center hover:text-foreground"
+                        >
+                          <Linkedin className="h-4 w-4 mr-1" />
+                          {profile.linkedin_username}
+                        </a>
+                      )}
+                      {profile.website && (
+                        <a
+                          href={profile.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center hover:text-foreground"
+                        >
+                          <Globe className="h-4 w-4 mr-1" />
+                          {profile.website}
+                        </a>
+                      )}
+                      
                     </div>
-                  </div>
-                  <div className="flex flex-wrap gap-4 mt-2">
-                    {profile.github_username && (
-                      <a
-                        href={`https://github.com/${profile.github_username}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
-                      >
-                        <Github className="h-4 w-4" />
-                        {profile.github_username}
-                      </a>
-                    )}
-                    {profile.website && (
-                      <a
-                        href={profile.website.startsWith('http') ? profile.website : `https://${profile.website}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-sm text-muted-foreground hover:text-foreground flex items-center gap-1"
-                      >
-                        <Globe className="h-4 w-4" />
-                        {profile.website}
-                      </a>
-                    )}
-                    {profile.address && (
-                      <span className="text-sm text-muted-foreground flex items-center gap-1">
-                        <Globe className="h-4 w-4" />
-                        {profile.address}
-                      </span>
-                    )}
-                  </div>
-                  <div className="flex items-center gap-4 mt-4">
-                    <EditProfileModal 
-                      profile={profile} 
-                      onProfileUpdate={handleProfileUpdate}
-                      trigger={
-                        <Button variant="outline" size="sm">
-                          <Edit className="h-4 w-4 mr-2" />
-                          Edit Profile
-                        </Button>
-                      }
-                    />
-                    <Button variant="outline" size="sm" onClick={handleShare}>
+                     <div className="mt-4 flex gap-2 ">
+                     <Button variant="outline" size="sm" onClick={handleShare} className='hover:cursor-pointer'>
                       <Share2 className="h-4 w-4 mr-2" />
                       Share Profile
-                    </Button>
-                    {/* <div className="flex items-center gap-2">
-                      <Switch
-                        checked={!profile.isPrivate}
-                        onCheckedChange={handleVisibilityToggle}
-                      />
-                      <span className="text-sm text-muted-foreground">
-                        {!profile.isPrivate ? 'Public' : 'Private'}
-                      </span>
-                    </div> */}
+                      </Button>
+                      <EditProfileModal profile={profile} onProfileUpdate={handleProfileUpdate} />
+                     </div>
                   </div>
+                  
                 </div>
+                
+                  <TownhallBadge townhall={profile.townhall} />
+          
               </div>
             </CardContent>
           </Card>

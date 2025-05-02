@@ -57,13 +57,9 @@ export interface DailyStats {
 }
 
 export interface UserProfile {
-  id: number;
-  username: string;
+  id: string;
   email: string;
-  twitterId?: string;
-  linkedinId?: string;
-  profile_url?: string;
-  app_name: AppName;
+  username: string;
   website?: string;
   github_username?: string;
   twitter_username?: string;
@@ -74,16 +70,15 @@ export interface UserProfile {
   categories_used_public: boolean;
   os_used_public: boolean;
   logged_time_public: boolean;
-  timezone?: string;
-  subscriptionTier: SubscriptionTier;
-  subscriptionStart?: string;
-  subscriptionEnd?: string;
-  billingInterval?: BillingInterval;
-  stripeCustomerId?: string;
+  profile_url?: string;
+  subscriptionTier: string;
   teamId?: number;
-  isTeamAdmin: boolean;
-  createdAt: string;
-  updatedAt: string;
+  townhall: {
+    level: number;
+    hoursCoded: number;
+    nextLevelMinHours: number;
+    hoursToNext: number;
+  };
 }
 
 export interface LeaderboardResponse {
