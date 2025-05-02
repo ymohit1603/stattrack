@@ -33,7 +33,7 @@ const Navbar = () => {
 
   const navLinks = [
     { href: '/dashboard', label: 'Dashboard' },
-    { href: '/stats', label: 'Statistics' },
+    { href: '/leaderboard', label: 'Leaderboard' },
     { href: '/profile', label: 'Profile' },
   ];
 

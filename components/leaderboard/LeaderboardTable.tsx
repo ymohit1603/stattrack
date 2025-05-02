@@ -3,6 +3,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Badge } from '@/components/ui/badge';
 import { LanguagesColumn } from './LanguagesColumn';
 import type { LeaderboardResponse } from '@/lib/api';
+import { Twitter, Linkedin } from 'lucide-react';
 
 interface LeaderboardTableProps {
   data: LeaderboardResponse['data'];
@@ -65,7 +66,7 @@ export const LeaderboardTable: React.FC<LeaderboardTableProps> = ({ data }) => {
                 {rank.days_coded}
               </td>
               <td className="py-4 px-4">
-                <LanguagesColumn languages={rank.languages} />
+                <LanguagesColumn languages={rank.languages_breakdown} />
               </td>
             </tr>
           ))}

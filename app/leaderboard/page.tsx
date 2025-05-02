@@ -14,7 +14,7 @@ import type { LeaderboardResponse } from '@/lib/api';
 
 const Leaderboard: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  const [timeframe, setTimeframe] = useState<'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year'>('last_7_days');
+  const [timeframe, setTimeframe] = useState<'today' | 'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year'>('last_7_days');
   const [leaderboardData, setLeaderboardData] = useState<LeaderboardResponse['data'] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -128,6 +128,7 @@ const Leaderboard: React.FC = () => {
                 <SelectValue placeholder="Time Period" />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="today">Today</SelectItem>
                 <SelectItem value="last_7_days">Last 7 Days</SelectItem>
                 <SelectItem value="last_30_days">Last 30 Days</SelectItem>
                 <SelectItem value="last_6_months">Last 6 Months</SelectItem>

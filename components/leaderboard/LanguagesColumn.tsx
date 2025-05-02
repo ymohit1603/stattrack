@@ -2,9 +2,9 @@ import React from 'react';
 import { Code2 } from 'lucide-react';
 
 interface Language {
-  name: string;
+  language: string;
   total_seconds: number;
-  percentage: number;
+
 }
 
 interface LanguagesColumnProps {
@@ -57,10 +57,10 @@ export const LanguagesColumn: React.FC<LanguagesColumnProps> = ({ languages }) =
         <div
           key={index}
           className={`px-3 py-1 rounded-full text-sm font-medium ${
-            languageColors[lang.name] || languageColors.default
+            languageColors[lang.language] || languageColors.default
           }`}
         >
-          {lang.name} {formatTime(lang.total_seconds)}
+          {lang.language} {formatTime(lang.total_seconds)}
         </div>
       ))}
     </div>

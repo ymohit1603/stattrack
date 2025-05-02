@@ -119,10 +119,10 @@ export interface LeaderboardResponse {
       total_seconds: number;
       days_coded: number;
       badge: 'gold' | 'silver' | 'bronze' | null;
-      languages: Array<{
-        name: string;
+      languages_breakdown: Array<{
+        language: string;
         total_seconds: number;
-        percentage: number;
+        
       }>;
     }>;
   };
@@ -276,10 +276,11 @@ export const userApi = {
 
 // Leaderboard + Projects API
 export const leaderboardApi = {
-  getLeaderboard: async (timeframe: 'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year' = 'last_7_days'): Promise<LeaderboardResponse> => {
+  getLeaderboard: async (timeframe: 'today' | 'last_7_days' | 'last_30_days' | 'last_6_months' | 'last_year' = 'last_7_days'): Promise<LeaderboardResponse> => {
     const { data } = await api.get<LeaderboardResponse>('/users/current/leaderboards', {
       params: { range: timeframe }
     });
+    console.log("data",data)
     return data;
   },
 
