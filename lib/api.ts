@@ -115,10 +115,10 @@ export interface LeaderboardResponse {
       total_seconds: number;
       days_coded: number;
       badge: 'gold' | 'silver' | 'bronze' | null;
+      level: number;
       languages_breakdown: Array<{
         language: string;
         total_seconds: number;
-        
       }>;
     }>;
   };
