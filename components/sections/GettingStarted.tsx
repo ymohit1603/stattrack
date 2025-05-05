@@ -13,7 +13,7 @@ const StepCard = ({
   number: number; 
   title: string; 
   description: string; 
-  image: string;
+  image?: string;
   icon: any;
 }) => {
   return (
@@ -29,11 +29,11 @@ const StepCard = ({
           </div>
           <p className="text-gray-600 dark:text-gray-400 mb-4">{description}</p>
           <div className="rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
-            <img 
+            {image && <img 
               src={image} 
               alt={title} 
               className="w-full h-auto object-cover"
-            />
+            />}
           </div>
         </div>
       </div>
@@ -56,21 +56,21 @@ const GettingStarted = () => {
       number: 2,
       title: "Install VS Code Extension",
       description: "Download and install the StatTrack extension from the VS Code marketplace.",
-      image: "/Image2.png", // Replace with actual extension screenshot
+      image: "/ext1.png", // Replace with actual extension screenshot
       icon: Download
     },
     {
       number: 3,
       title: "Configure Your API Key",
       description: "Press Ctrl+Shift+P, search for 'StatTrack API Key', and paste your session ID.",
-      image: "/Image3.png", // Replace with actual command palette screenshot
+      image: "/ext2.png", // Replace with actual command palette screenshot
       icon: KeyRound
     },
     {
       number: 4,
       title: "Start Your Coding Journey",
       description: "Press Enter and watch as your coding stats come to life! 🚀 Time to make your keyboard proud!",
-      image: "/Image4.png", // Replace with actual tracking screenshot
+      
       icon: Rocket
     }
   ];
@@ -80,7 +80,7 @@ const GettingStarted = () => {
       <div className="container mx-auto px-4 md:px-6">
         <div className="text-center max-w-3xl mx-auto mb-12 md:mb-16">
           <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
-            Get Started in Minutes
+            Get Started in Seconds
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400">
             Follow these simple steps to start tracking your coding journey
