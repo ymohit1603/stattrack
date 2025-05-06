@@ -3,12 +3,12 @@
   "style": "new-york",
   "rsc": true,
   "tsx": true,
-  "tailwind": {
+  "tailwind": {  
     "config": "",
     "css": "app/globals.css",
     "baseColor": "neutral",
     "cssVariables": true,
-    "prefix": ""
+    "prefix": ""            
   },
   "aliases": {
     "components": "@/components",

@@ -73,7 +73,9 @@ const GettingStarted = () => {
       
       icon: Rocket
     }
-  ];
+  ]; 
+
+  
 
   return (
     <section ref={gettingStartedRef} id="getting-started" className="py-16 md:py-24 bg-gray-50 dark:bg-gray-900/50">
