@@ -49,7 +49,7 @@ const GettingStarted = () => {
       number: 1,
       title: "Login & Get Your Session ID",
       description: "Sign in to StatTrack and copy your unique session ID from your profile settings.",
-      image: "/Image1.png", // Replace with actual login screenshot
+      image: "/image.png", // Replace with actual login screenshot
       icon: Terminal
     },
     {
@@ -62,7 +62,7 @@ const GettingStarted = () => {
     {
       number: 3,
       title: "Configure Your API Key",
-      description: "Press Ctrl+Shift+P, search for 'StatTrack API Key', and paste your session ID.",
+      description: "Press Ctrl+Shift+P, search for 'StatTrack API Key', and paste your session key.",
       image: "/ext2.png", // Replace with actual command palette screenshot
       icon: KeyRound
     },

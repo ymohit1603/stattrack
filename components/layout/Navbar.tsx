@@ -13,7 +13,8 @@ import {
   LogOut,
   ChevronDown,
   ArrowRight,
-  Mail
+  Mail,
+  Key
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/lib/auth';
@@ -26,10 +27,37 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { generateSessionKey } from '@/lib/session';
+import { useToast } from '@/components/ui/use-toast';
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { toast } = useToast();
+
+  const handleCopySessionKey = () => {
+    if (!user?.id) return;
+    
+    const sessionKey = generateSessionKey(user.id.toString());
+    navigator.clipboard.writeText(sessionKey);
+    
+    toast({
+      title: "Session Key Copied! 🔑",
+      description: (
+        <div className="flex items-center gap-2">
+          <div className="flex-1">
+            <p className="text-sm font-medium">Your session key has been copied</p>
+            <p className="text-xs text-muted-foreground mt-1">Click to dismiss</p>
+          </div>
+          <div className="h-8 w-8 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+            <Key className="h-4 w-4 text-green-600 dark:text-green-400" />
+          </div>
+        </div>
+      ),
+      duration: 3000, // Auto dismiss after 3 seconds
+      className: "bg-white dark:bg-gray-800 border border-green-200 dark:border-green-800 shadow-lg",
+    });
+  };
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -98,6 +126,13 @@ const Navbar = () => {
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem 
+                    onClick={handleCopySessionKey}
+                    className="cursor-pointer"
+                  >
+                    <Key className="mr-2 h-4 w-4" />
+                    <span>Copy Session Key</span>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem 
                     onClick={logout}
                     className="cursor-pointer text-red-600 dark:text-red-400 focus:text-red-600 dark:focus:text-red-400"
                   >
@@ -108,10 +143,6 @@ const Navbar = () => {
               </DropdownMenu>
             ) : (
               <div className="flex items-center space-x-4">
-                <Button variant="ghost" onClick={scrollToGettingStarted} className="group cursor-pointer">
-                  Get Started
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
                 <Link href="/login">
                   <Button className="cursor-pointer">Login</Button>
                 </Link>
@@ -143,7 +174,6 @@ const Navbar = () => {
               <Link
                 key={link.href}
                 href={link.href}
-                // onClick={link.onClick}
                 className="block px-4 py-2 text-foreground/80 hover:text-foreground hover:bg-accent rounded-md transition-colors cursor-pointer"
               >
                 {link.label}
@@ -179,14 +209,6 @@ const Navbar = () => {
               </div>
             ) : (
               <div className="space-y-2 px-4">
-                <Button 
-                  variant="ghost" 
-                  className="w-full justify-start group cursor-pointer"
-                  onClick={scrollToGettingStarted}
-                >
-                  Get Started
-                  <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" />
-                </Button>
                 <Link
                   href="/login"
                   className="block"
