@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
+  children,  
 }: {
   children: React.ReactNode;
 }) {
@@ -23,12 +23,13 @@ export default function RootLayout({
     <html lang="en" className="h-full">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased h-full`}>
         <AuthGuard>
-          <MainLayout>
+          <MainLayout>   
             {children}
           </MainLayout>
-        </AuthGuard>
-        <Toaster />
-      </body>
+        </AuthGuard>     
+        <Toaster /> 
+      </body> 
     </html>
   );
 }
+
