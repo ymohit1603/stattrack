@@ -35,11 +35,11 @@ const Navbar = () => {
   const { user, logout } = useAuth();
   const { toast } = useToast();
 
-  const handleCopySessionKey = () => {
+  const handleCopySessionKey = async () => {
     if (!user?.id) return;
     
     const sessionKey = generateSessionKey(user.id.toString());
-    navigator.clipboard.writeText(sessionKey);
+    navigator.clipboard.writeText(await sessionKey);
     
     toast({
       title: "Session Key Copied! 🔑",
