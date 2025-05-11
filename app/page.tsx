@@ -21,10 +21,10 @@ function App() {
     <ThemeProvider>
       <div className="min-h-screen bg-white dark:bg-gray-900 text-gray-900 dark:text-white">
         <Header />
-        <main>
-          <Hero />
-          <Features />
-          <GettingStarted />
+        <main>     
+          <Hero />   
+          <Features /> 
+          <GettingStarted />           
           {/* <Testimonials /> */}
           {/* <Pricing /> */}
           <FAQ />
