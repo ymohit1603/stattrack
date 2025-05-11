@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-
-const nextConfig: NextConfig = {
-  /* config options here */
-};
-
-export default nextConfig;
+module.exports = {
+  env: {
+    SESSION_SECRET: 'Mohit@1033', // never use NEXT_PUBLIC_ here
+  },
+};  

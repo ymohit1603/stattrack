@@ -1,12 +1,27 @@
 import { sign } from 'jsonwebtoken';
+import dotenv from 'dotenv'; 
+dotenv.config();  
+   
+const SESSION_SECRET = process.env.SESSION_SECRET;    
 
-const SESSION_SECRET = process.env.NEXT_PUBLIC_SESSION_SECRET || 'your-secret-key';
+export const generateSessionKey = async (userId: string): Promise<string> => {
+  try {
+    const response = await fetch('/api/session', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userId }),
+    });
 
-export const generateSessionKey = (userId: string): string => {
-  const payload = {
-    userId,
-    iat: Math.floor(Date.now() / 1000),
-  };
-
-  return sign(payload, SESSION_SECRET, { algorithm: 'HS256' });
+    if (!response.ok) {
+      throw new Error('Failed to generate session key');
+    }  
+    console.log(response);
+    const { sessionKey } = await response.json();
+    return sessionKey;
+  } catch (error) {
+    console.error('Error generating session key:', error);
+    throw error;
+  }
 }; 
